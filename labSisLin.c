@@ -7,7 +7,6 @@
 
 int main ()
 {
-
-
+    SistLinear_t * sistLin = alocaSistLinear(3);
+    prnSistLinear(sistLin);
 }
-

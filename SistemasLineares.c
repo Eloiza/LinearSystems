@@ -6,7 +6,7 @@
 #include "SistemasLineares.h"
 
 /*!
-  \brief Essa função calcula a norma L2 do resíduo de um sistema linear 
+  \brief Essa função calcula a norma L2 do resíduo de um sistema linear
 
   \param SL Ponteiro para o sistema linear
   \param x Solução do sistema linear
@@ -17,7 +17,7 @@
 real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 {
 
-}
+};
 
 
 /*!
@@ -34,7 +34,7 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
 {
 
 
-}
+};
 
 /*!
   \brief Método de Jacobi
@@ -54,7 +54,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
 {
 
 
-}
+};
 
 /*!
   \brief Método de Gauss-Seidel
@@ -74,7 +74,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
 {
 
 
-}
+};
 
 
 /*!
@@ -93,23 +93,34 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
 {
 
 
-}
+};
 
 /*!
-  \brief Alocaçao de memória 
+  \brief Alocaçao de memória
 
   \param n tamanho do SL
 
   \return ponteiro para SL. NULL se houve erro de alocação
   */
-SistLinear_t* alocaSistLinear (unsigned int n)
-{
+SistLinear_t* alocaSistLinear (unsigned int n){
+    SistLinear_t * sistLin = malloc(sizeof(SistLinear_t));
+    if(!sistLin){
+        printf("Error to alocate memory for sistLinear_t\n");
+    }
+    sistLin->n = n;
+    sistLin->erro = 0;
+    sistLin->b = malloc(sizeof(real_t)*n);
 
+    sistLin->A = malloc(sizeof(real_t*)*n);
+    for(int i=0; i<n; i++){
+        sistLin->A[i] = malloc(sizeof(real_t)*n);
+    }
 
-}
+    return sistLin;
+};
 
 /*!
-  \brief Liberaçao de memória 
+  \brief Liberaçao de memória
 
   \param sistema linear SL
   */
@@ -117,7 +128,7 @@ void liberaSistLinear (SistLinear_t *SL)
 {
 
 
-}
+};
 
 /*!
   \brief Leitura de SL a partir de Entrada padrão (stdin).
@@ -126,19 +137,37 @@ void liberaSistLinear (SistLinear_t *SL)
   */
 SistLinear_t *lerSistLinear ()
 {
-  
-}
+
+};
 
 
 // Exibe SL na saída padrão
-void prnSistLinear (SistLinear_t *SL)
-{
+void prnSistLinear (SistLinear_t *SL){
+    int i;
+    printf("n: %d \nerro: %lf \n", SL->n, SL->erro);
 
-}
+    // print the independet terms vector
+    printf("b: ");
+    prnVetor(SL->b, SL->n);
+
+    //print the coeficients matrix
+    printf("A:\n");
+    for(i=0; i<SL->n; i++){
+        prnVetor(SL->A[i], SL->n);
+    }
+};
 
 // Exibe um vetor na saída padrão
-void prnVetor (real_t *v, unsigned int n)
-{
+void prnVetor (real_t *v, unsigned int n){
+    int i = 0;
+    for(i=0; i<n; i++){
+        //case last position
+        if(i == n - 1){
+            printf("%lf ", v[i]);
 
-}
-
+        }else{
+            printf("%lf, ", v[i]);
+        }
+    }
+    printf("\n");
+};
