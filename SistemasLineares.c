@@ -124,10 +124,28 @@ SistLinear_t* alocaSistLinear (unsigned int n){
 
   \param sistema linear SL
   */
-void liberaSistLinear (SistLinear_t *SL)
-{
+void liberaSistLinear (SistLinear_t *SL){
+    int i=0;
 
+    //free the matrix lines
+    for(i=0; i<SL->n; i++){
+        free(SL->A[i]);
+    }
 
+    //free the left pointers
+    free(SL->A);
+    free(SL->b);
+
+    //set to 0 the other atributes
+    SL->erro = 0;
+    SL->n = 0;
+
+    //set to NULL all pointers
+    SL->A = NULL;
+    SL->b = NULL;
+
+    //free all the structure
+    free(SL);
 };
 
 /*!
