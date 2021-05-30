@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils.h"
 #include "SistemasLineares.h"
+
+#define BUFFER_SIZE 100
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear
@@ -153,9 +156,51 @@ void liberaSistLinear (SistLinear_t *SL){
 
   \return sistema linear SL. NULL se houve erro (leitura ou alocação)
   */
-SistLinear_t *lerSistLinear ()
-{
+SistLinear_t *lerSistLinear (){
+    int n;
+    real_t error;
 
+    scanf("%i", &n);
+    scanf("%f", &error);
+
+    printf("n: %d\n", n);
+    printf("error: %f\n", error);
+
+    getchar();
+
+    SistLinear_t * sistLin = alocaSistLinear(n);
+    sistLin->erro = error;
+
+    char buffer[BUFFER_SIZE];
+    char * token;
+    int index = 0;
+
+    for(int i=0; i< n + 1; i++){
+        index = 0;
+        //read a line and store in buffer
+        if(fgets(buffer, BUFFER_SIZE, stdin) == NULL){
+            printf("Error to catch a line\n");
+
+        }else{
+            //get one digit from the line
+            token = strtok(buffer, " ");
+            while(token != NULL){
+                if(i == 0){
+                    sistLin->b[index] = atof(token);
+                    printf("sistLin->b[%i] = %f\n", index, atof(token));
+                }
+                else{
+                    sistLin->A[i-1][index] = atof(token);
+                    printf("sistLin->A[%i][%i] = %f\n", i-1, index, atof(token));
+                }
+
+                index++;
+                token = strtok(NULL, " ");
+            }
+        }//end else
+    }//end for
+
+    return sistLin;
 };
 
 
