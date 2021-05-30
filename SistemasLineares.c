@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "SistemasLineares.h"
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 1000
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear
@@ -114,9 +114,27 @@ SistLinear_t* alocaSistLinear (unsigned int n){
     sistLin->erro = 0;
     sistLin->b = malloc(sizeof(real_t)*n);
 
+    //case of error in memory allocation
+    if(!sistLin->b){
+        fprintf(stderr, "%s", "Error to allocate memory for vector b!\n");
+        exit(-1);
+    }
+
     sistLin->A = malloc(sizeof(real_t*)*n);
+
+    if(!sistLin->A){
+        fprintf(stderr, "%s", "Error to allocate memory for vector A!\n");
+        exit(-1);
+    }
+
     for(int i=0; i<n; i++){
         sistLin->A[i] = malloc(sizeof(real_t)*n);
+
+        if(!sistLin->A[1]){
+            fprintf(stderr, "%s", "Error to allocate memory for vector A!\n");
+            exit(-1);
+        }
+
     }
 
     return sistLin;
@@ -162,10 +180,11 @@ SistLinear_t *lerSistLinear (){
 
     scanf("%i", &n);
     scanf("%f", &error);
+    //
+    // printf("n: %d\n", n);
+    // printf("error: %f\n", error);
 
-    printf("n: %d\n", n);
-    printf("error: %f\n", error);
-
+    //get the \n
     getchar();
 
     SistLinear_t * sistLin = alocaSistLinear(n);
@@ -179,7 +198,8 @@ SistLinear_t *lerSistLinear (){
         index = 0;
         //read a line and store in buffer
         if(fgets(buffer, BUFFER_SIZE, stdin) == NULL){
-            printf("Error to catch a line\n");
+            fprintf(stderr, "%s", "Error to read a line!\n");
+            exit(-1);
 
         }else{
             //get one digit from the line
@@ -187,11 +207,11 @@ SistLinear_t *lerSistLinear (){
             while(token != NULL){
                 if(i == 0){
                     sistLin->b[index] = atof(token);
-                    printf("sistLin->b[%i] = %f\n", index, atof(token));
+                    // printf("sistLin->b[%i] = %f\n", index, atof(token));
                 }
                 else{
                     sistLin->A[i-1][index] = atof(token);
-                    printf("sistLin->A[%i][%i] = %f\n", i-1, index, atof(token));
+                    // printf("sistLin->A[%i][%i] = %f\n", i-1, index, atof(token));
                 }
 
                 index++;
