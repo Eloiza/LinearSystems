@@ -6,7 +6,20 @@
 #include "utils.h"
 #include "SistemasLineares.h"
 
-#define BUFFER_SIZE 1000
+#define BUFFER_SIZE 100
+
+//Realiza retro substituição.
+int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
+    for(int i= SL->n -1; i >=0; i--){
+        x[i] = SL->b[i];
+        for(int j = i+1; j< SL->n; j++)
+            //overflow, erros de aproximacao devido subtracao
+            x[i] -= SL->A[i][j] * x[j];
+
+        //divisão por 0
+        x[i] /= SL->A[i][j]
+    }
+};
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear
@@ -28,15 +41,39 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 
   \param SL Ponteiro para o sistema linear
   \param x ponteiro para o vetor solução
-  \param tTriangulariza tempo gasto na triangularização
+  \param tTotal tempo gasto na triangularização
   \param tRetroSubst tempo gasto na retrosubstituição
 
   \return código de erro. 0 em caso de sucesso.
 */
-int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal)
-{
+int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
+    //uses pivoteamento parcial
 
+    unsigned int iPivo; //stores the pivo index
+    double m;
+    //we first eliminate the variables to get a triangular linear system
+    for(int i=0; i<SL->n; i++){
+        //find the greatest number in this row
+        iPivo = findMAX(SL->A, i);
 
+        if(i != iPivo){
+            swapLine(SL, i, iPivo);
+        }
+
+        for(int k= i+1; k< SL->n; k++){
+            m = SL->A[k][i] / SL->A[i][j];
+            SL->A[k][i] = 0;
+            for(int j= i+1; j<SL->n; j++)
+                SL->A[k][j] -= SL->A[i][j]*m;
+
+            b[k] -= B[i] * m;
+
+        }
+    }
+
+    //solve retrosubstituição
+
+    return 0;
 };
 
 /*!
@@ -130,7 +167,7 @@ SistLinear_t* alocaSistLinear (unsigned int n){
     for(int i=0; i<n; i++){
         sistLin->A[i] = malloc(sizeof(real_t)*n);
 
-        if(!sistLin->A[1]){
+        if(!sistLin->A[i]){
             fprintf(stderr, "%s", "Error to allocate memory for vector A!\n");
             exit(-1);
         }
