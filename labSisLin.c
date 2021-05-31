@@ -18,6 +18,7 @@ int main (){
             sistLin = lerSistLinear();
             prnSistLinear(sistLin);
             eliminacaoGauss(sistLin, solution, &totalTime);
+            printf("SOLUCAO:\n");
             prnVetor(solution, sistLin->n);
 
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel

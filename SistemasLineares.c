@@ -17,9 +17,25 @@ int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
             x[i] -= SL->A[i][j] * x[j];
 
         //divisão por 0
-        x[i] /= SL->A[i][j]
+        x[i] /= SL->A[i][i];
     }
+
+    return 0;
 };
+
+unsigned int findMAX(SistLinear_t *SL, unsigned int lin){
+    real_t max_value = SL->A[lin][0];
+    unsigned int max_index = 0;
+
+    for(int i=0; i< SL->n; i++){
+        if(SL->A[lin][i] > max_value){
+            max_value = SL->A[lin][i];
+            max_index = i;
+        }
+    }
+
+    return max_index;
+}
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear
@@ -34,7 +50,6 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 {
 
 };
-
 
 /*!
   \brief Método da Eliminação de Gauss
@@ -51,27 +66,35 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
     unsigned int iPivo; //stores the pivo index
     double m;
+    real_t * aux;
+
     //we first eliminate the variables to get a triangular linear system
     for(int i=0; i<SL->n; i++){
         //find the greatest number in this row
-        iPivo = findMAX(SL->A, i);
+        iPivo = findMAX(SL, i);
 
         if(i != iPivo){
-            swapLine(SL, i, iPivo);
+            //swap lines
+            aux = SL->A[i];
+            SL->A[i] = SL->A[iPivo];
+            SL->A[iPivo] = aux;
         }
 
         for(int k= i+1; k< SL->n; k++){
-            m = SL->A[k][i] / SL->A[i][j];
+            m = SL->A[k][i] / SL->A[i][i];
             SL->A[k][i] = 0;
             for(int j= i+1; j<SL->n; j++)
                 SL->A[k][j] -= SL->A[i][j]*m;
 
-            b[k] -= B[i] * m;
-
+            SL->b[k] -= SL->b[i] * m;
         }
+
     }
 
+    prnSistLinear(SL);
     //solve retrosubstituição
+    double tRetro = 0;
+    retroSubst(SL, x, &tRetro);
 
     return 0;
 };
