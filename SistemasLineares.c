@@ -23,13 +23,13 @@ int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
     return 0;
 };
 
-unsigned int findMAX(SistLinear_t *SL, unsigned int lin){
-    real_t max_value = SL->A[lin][0];
+unsigned int findMAX(SistLinear_t *SL, unsigned int col){
+    real_t max_value = SL->A[0][col];
     unsigned int max_index = 0;
 
     for(int i=0; i< SL->n; i++){
-        if(SL->A[lin][i] > max_value){
-            max_value = SL->A[lin][i];
+        if(fabs(SL->A[i][col]) > fabs(max_value)){
+            max_value = SL->A[i][col];
             max_index = i;
         }
     }
@@ -62,35 +62,51 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
   \return código de erro. 0 em caso de sucesso.
 */
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
-    //uses pivoteamento parcial
-
     unsigned int iPivo; //stores the pivo index
     double m;
-    real_t * aux;
-
+    real_t * aux_m;
+    real_t aux_v;
     //we first eliminate the variables to get a triangular linear system
     for(int i=0; i<SL->n; i++){
+        printf("==============>VALOR DE I: %i\n\n",i);
         //find the greatest number in this row
         iPivo = findMAX(SL, i);
 
         if(i != iPivo){
-            //swap lines
-            aux = SL->A[i];
+            //swap lines in matrix
+            aux_m = SL->A[i];
             SL->A[i] = SL->A[iPivo];
-            SL->A[iPivo] = aux;
+            SL->A[iPivo] = aux_m;
+
+            //swap lines in vector b
+            aux_v = SL->b[i];
+            SL->b[i] = SL->b[iPivo];
+            SL->b[iPivo] = aux_v;
+
+            printf("Troquei linha %i por %i\n",i, iPivo);
+            prnSistLinear(SL);
+            printf("\n\n");
         }
 
         for(int k= i+1; k< SL->n; k++){
             m = SL->A[k][i] / SL->A[i][i];
+            // printf("m = A[%i][%i](%f) / A[%i][%i](%f)\n", k, i, SL->A[k][i], i, i, SL->A[i][i]);
+            // printf("m = %f\n", m);
+
             SL->A[k][i] = 0;
-            for(int j= i+1; j<SL->n; j++)
+            for(int j= i+1; j<SL->n; j++){
                 SL->A[k][j] -= SL->A[i][j]*m;
+                // printf("SL->A[%i][%i] -= SL->A[%i][%i]*%f\n",k,j,i,j,m);
+                // printf("SL->A[%i][%i] = %f\n",k,j, SL->A[k][j]);
+            }
 
             SL->b[k] -= SL->b[i] * m;
         }
 
+        prnSistLinear(SL);
+        printf("\n\n");
     }
-
+    printf("APÓS ELIMANCAO DE GAUSS\n");
     prnSistLinear(SL);
     //solve retrosubstituição
     double tRetro = 0;
