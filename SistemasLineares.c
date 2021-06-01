@@ -8,6 +8,22 @@
 
 #define BUFFER_SIZE 100
 
+
+void swapLine(SistLinear_t * SL, int i, int j){
+    real_t * aux_m;
+    real_t aux_v;
+
+    //swap lines in matrix
+    aux_m = SL->A[i];
+    SL->A[i] = SL->A[j];
+    SL->A[j] = aux_m;
+
+    //swap lines in vector b
+    aux_v = SL->b[i];
+    SL->b[i] = SL->b[j];
+    SL->b[j] = aux_v;
+}
+
 //Realiza retro substituição.
 int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
     for(int i= SL->n -1; i >=0; i--){
@@ -64,53 +80,30 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     unsigned int iPivo; //stores the pivo index
     double m;
-    real_t * aux_m;
-    real_t aux_v;
-    //we first eliminate the variables to get a triangular linear system
+
     for(int i=0; i<SL->n; i++){
-        printf("==============>VALOR DE I: %i\n\n",i);
-        //find the greatest number in this row
         iPivo = findMAX(SL, i);
 
         if(i != iPivo){
-            //swap lines in matrix
-            aux_m = SL->A[i];
-            SL->A[i] = SL->A[iPivo];
-            SL->A[iPivo] = aux_m;
-
-            //swap lines in vector b
-            aux_v = SL->b[i];
-            SL->b[i] = SL->b[iPivo];
-            SL->b[iPivo] = aux_v;
-
-            printf("Troquei linha %i por %i\n",i, iPivo);
-            prnSistLinear(SL);
-            printf("\n\n");
+            swapLine(SL, i, iPivo);
         }
 
         for(int k= i+1; k< SL->n; k++){
             m = SL->A[k][i] / SL->A[i][i];
-            // printf("m = A[%i][%i](%f) / A[%i][%i](%f)\n", k, i, SL->A[k][i], i, i, SL->A[i][i]);
-            // printf("m = %f\n", m);
 
             SL->A[k][i] = 0;
             for(int j= i+1; j<SL->n; j++){
-                SL->A[k][j] -= SL->A[i][j]*m;
-                // printf("SL->A[%i][%i] -= SL->A[%i][%i]*%f\n",k,j,i,j,m);
-                // printf("SL->A[%i][%i] = %f\n",k,j, SL->A[k][j]);
+                SL->A[k][j] = SL->A[k][j] - (SL->A[i][j] * m);
             }
 
-            SL->b[k] -= SL->b[i] * m;
+            SL->b[k] = SL->b[k] - (SL->b[i] * m);
         }
-
-        prnSistLinear(SL);
-        printf("\n\n");
     }
-    printf("APÓS ELIMANCAO DE GAUSS\n");
+    printf("\nAPÓS ELIMANCAO DE GAUSS\n");
     prnSistLinear(SL);
-    //solve retrosubstituição
-    double tRetro = 0;
-    retroSubst(SL, x, &tRetro);
+
+    // double tRetro = 0;
+    // retroSubst(SL, x, &tRetro);
 
     return 0;
 };
@@ -281,13 +274,13 @@ SistLinear_t *lerSistLinear (){
             //get one digit from the line
             token = strtok(buffer, " ");
             while(token != NULL){
-                if(i == 0){
+                if(i == n){
                     sistLin->b[index] = atof(token);
                     // printf("sistLin->b[%i] = %f\n", index, atof(token));
                 }
                 else{
-                    sistLin->A[i-1][index] = atof(token);
-                    // printf("sistLin->A[%i][%i] = %f\n", i-1, index, atof(token));
+                    sistLin->A[i][index] = atof(token);
+                    // printf("sistLin->A[%i][%i] = %f\n", i, index, atof(token));
                 }
 
                 index++;
@@ -314,6 +307,8 @@ void prnSistLinear (SistLinear_t *SL){
     for(i=0; i<SL->n; i++){
         prnVetor(SL->A[i], SL->n);
     }
+
+    printf("\n");
 };
 
 // Exibe um vetor na saída padrão
