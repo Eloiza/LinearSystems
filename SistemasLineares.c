@@ -8,6 +8,29 @@
 
 #define BUFFER_SIZE 300
 
+/*Copy the elements of two vectors with the same size*/
+void cpyVector(real_t * destiny, real_t * source, int size){
+    for(int i=0; i<size; i++){
+        destiny[i] = source[i];
+    }
+}
+
+void cpyMatrix(real_t ** destiny, real_t ** source, int size){
+    for(int i=0; i<size; i++){
+        for(int j=0; j<size; j++){
+            destiny[i][j] = source[i][j];
+        }
+    }
+}
+
+/*Copy the attributes of two linear systems. They need to have
+the same size of A matrix and b vector*/
+void cpySist(SistLinear_t * destiny, SistLinear_t * source){
+    destiny->n = source->n;
+    destiny->erro = source->erro;
+    cpyVector(destiny->b, source->b, destiny->n);
+    cpyMatrix(destiny->A, source->A, destiny->n);
+}
 
 void swapLine(SistLinear_t * SL, int i, int j){
     real_t * aux_m;
@@ -81,27 +104,30 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     unsigned int iPivo; //stores the pivo index
     double m;
 
-    for(int i=0; i<SL->n; i++){
-        iPivo = findMAX(SL, i);
+    SistLinear_t * SL_copy = alocaSistLinear(SL->n);
+    cpySist(SL_copy, SL);
+
+    for(int i=0; i<SL_copy->n; i++){
+        iPivo = findMAX(SL_copy, i);
 
         if(i != iPivo){
-            swapLine(SL, i, iPivo);
+            swapLine(SL_copy, i, iPivo);
         }
 
-        for(int k= i+1; k< SL->n; k++){
-            m = SL->A[k][i] / SL->A[i][i];
+        for(int k= i+1; k< SL_copy->n; k++){
+            m = SL_copy->A[k][i] / SL_copy->A[i][i];
 
-            SL->A[k][i] = 0;
-            for(int j= i+1; j<SL->n; j++){
-                SL->A[k][j] = SL->A[k][j] - (SL->A[i][j] * m);
+            SL_copy->A[k][i] = 0;
+            for(int j= i+1; j<SL_copy->n; j++){
+                SL_copy->A[k][j] = SL_copy->A[k][j] - (SL_copy->A[i][j] * m);
             }
 
-            SL->b[k] = SL->b[k] - (SL->b[i] * m);
+            SL_copy->b[k] = SL_copy->b[k] - (SL_copy->b[i] * m);
         }
     }
 
     double tRetro = 0;
-    retroSubst(SL, x, &tRetro);
+    retroSubst(SL_copy, x, &tRetro);
 
     return 0;
 };
@@ -122,19 +148,6 @@ real_t calculateError(real_t * a, real_t * b, int length){
     }
 
     return maior;
-}
-
-/*Copy the elements of two vectors with the same size*/
-void cpyVector(real_t * destiny, real_t * source, int size){
-    for(int i=0; i<size; i++){
-        destiny[i] = source[i];
-    }
-}
-
-void resetVector(real_t * vector,  int size){
-    for(int i=0; i<size; i++){
-        vector[i] = 0;
-    }
 }
 
 /*!

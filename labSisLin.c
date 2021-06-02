@@ -16,14 +16,18 @@ int main (){
             printf("Resolvendo Sistema %i\n", n_sistema);
             prnSistLinear(sistLin);
 
+            real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
+
             //resolve sistema pela eliminacao de Gauss
-            // eliminacaoGauss(sistLin, solution, &totalTime);
-            // printf("Solução Gauss:\n");
-            // prnVetor(solution, sistLin->n);
+            printf("Resolvendo sistema com método de Gauss\n");
+            eliminacaoGauss(sistLin, solucao, &Gauss_t);
+            printf("Solução Gauss:\n");
+            prnVetor(solucao, sistLin->n);
             printf("\n");
+            printf("Sistema pos eliminacao: \n");
+            prnSistLinear(sistLin);
 
             //aloca memoria para vetor solucao
-            real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
 
             // printf("Resolvendo sistema com método de Jacobi\n");
             // gaussJacobi(sistLin, solucao, &Jacobi_t);
@@ -31,10 +35,10 @@ int main (){
             // printf("\n");
 
             // resetVector(solucao, sistLin->n);
-            printf("Resolvendo sistema com método de Gauss Seidel\n");
-            gaussSeidel(sistLin, solucao, &Seidel_t);
-            prnVetor(solucao, sistLin->n);
-            n_sistema++;
+            // printf("Resolvendo sistema com método de Gauss Seidel\n");
+            // gaussSeidel(sistLin, solucao, &Seidel_t);
+            // prnVetor(solucao, sistLin->n);
+            // n_sistema++;
 
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
             //Medir o tempo de cada solução
