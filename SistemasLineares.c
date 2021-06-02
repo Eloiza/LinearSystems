@@ -5,76 +5,9 @@
 
 #include "utils.h"
 #include "SistemasLineares.h"
+#include "SupportFunctions.h"
 
 #define BUFFER_SIZE 300
-
-/*Copy the elements of two vectors with the same size*/
-void cpyVector(real_t * destiny, real_t * source, int size){
-    for(int i=0; i<size; i++){
-        destiny[i] = source[i];
-    }
-}
-
-void cpyMatrix(real_t ** destiny, real_t ** source, int size){
-    for(int i=0; i<size; i++){
-        for(int j=0; j<size; j++){
-            destiny[i][j] = source[i][j];
-        }
-    }
-}
-
-/*Copy the attributes of two linear systems. They need to have
-the same size of A matrix and b vector*/
-void cpySist(SistLinear_t * destiny, SistLinear_t * source){
-    destiny->n = source->n;
-    destiny->erro = source->erro;
-    cpyVector(destiny->b, source->b, destiny->n);
-    cpyMatrix(destiny->A, source->A, destiny->n);
-}
-
-void swapLine(SistLinear_t * SL, int i, int j){
-    real_t * aux_m;
-    real_t aux_v;
-
-    //swap lines in matrix
-    aux_m = SL->A[i];
-    SL->A[i] = SL->A[j];
-    SL->A[j] = aux_m;
-
-    //swap lines in vector b
-    aux_v = SL->b[i];
-    SL->b[i] = SL->b[j];
-    SL->b[j] = aux_v;
-}
-
-//Realiza retro substituição.
-int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
-    for(int i= SL->n -1; i >=0; i--){
-        x[i] = SL->b[i];
-        for(int j = i+1; j< SL->n; j++)
-            //overflow, erros de aproximacao devido subtracao
-            x[i] -= SL->A[i][j] * x[j];
-
-        //divisão por 0
-        x[i] /= SL->A[i][i];
-    }
-
-    return 0;
-};
-
-unsigned int findMAX(SistLinear_t *SL, unsigned int col){
-    real_t max_value = SL->A[0][col];
-    unsigned int max_index = 0;
-
-    for(int i=0; i< SL->n; i++){
-        if(fabs(SL->A[i][col]) > fabs(max_value)){
-            max_value = SL->A[i][col];
-            max_index = i;
-        }
-    }
-
-    return max_index;
-}
 
 /*!
   \brief Essa função calcula a norma L2 do resíduo de um sistema linear
@@ -131,24 +64,6 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
     return 0;
 };
-
-real_t calculateError(real_t * a, real_t * b, int length){
-    real_t * result = malloc(sizeof(real_t)*length);
-
-    for(int i=0; i< length; i++){
-        result[i] = fabs(a[i] - b[i]);
-    }
-
-    real_t maior = 0;
-    //encontra o maior numero no vetor
-    for(int j=0; j< length; j++){
-        if(result[j] > maior){
-            maior = result[j];
-        }
-    }
-
-    return maior;
-}
 
 /*!
   \brief Método de Jacobi
