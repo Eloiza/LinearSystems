@@ -123,6 +123,13 @@ real_t calculateError(real_t * a, real_t * b, int length){
 
     return maior;
 }
+
+/*Copy the elements of two vectors with the same size*/
+void cpyVector(real_t * destiny, real_t * source, int size){
+    for(int i=0; i<size; i++){
+        destiny[i] = source[i];
+    }
+}
 /*!
   \brief Método de Jacobi
 
@@ -178,7 +185,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
         }
 
         //x_old receives x_new values
-        memcpy(x_old, x_new, SL->n);
+        cpyVector(x_old, x_new, SL->n);
 
         printf("Iterações para convergencia: %i\n", it_count);
     }
