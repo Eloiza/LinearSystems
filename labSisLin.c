@@ -13,32 +13,31 @@ int main (){
     while(c != EOF){
         if(c != ' '){
             sistLin = lerSistLinear();
-            printf("Resolvendo Sistema %i\n", n_sistema);
+            printf(">>>>>>>>>>Resolvendo Sistema %i<<<<<<<<<<\n", n_sistema);
             prnSistLinear(sistLin);
 
             real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
 
             //resolve sistema pela eliminacao de Gauss
-            printf("Resolvendo sistema com método de Gauss\n");
+            printf("===========Eliminação de Gauss===========\n\n");
             eliminacaoGauss(sistLin, solucao, &Gauss_t);
-            printf("Solução Gauss:\n");
             prnVetor(solucao, sistLin->n);
-            printf("\n");
-            printf("Sistema pos eliminacao: \n");
-            prnSistLinear(sistLin);
+            printf("Tempo: %lf\n\n", Gauss_t);
 
             //aloca memoria para vetor solucao
 
-            // printf("Resolvendo sistema com método de Jacobi\n");
-            // gaussJacobi(sistLin, solucao, &Jacobi_t);
-            // prnVetor(solucao, sistLin->n);
-            // printf("\n");
+            printf("===============Gauss Jacobi==============\n\n");
+            gaussJacobi(sistLin, solucao, &Jacobi_t);
+            prnVetor(solucao, sistLin->n);
+            printf("Tempo: %lf\n\n", Jacobi_t);
 
             // resetVector(solucao, sistLin->n);
-            // printf("Resolvendo sistema com método de Gauss Seidel\n");
-            // gaussSeidel(sistLin, solucao, &Seidel_t);
-            // prnVetor(solucao, sistLin->n);
-            // n_sistema++;
+            printf("===============Gauss Seidel===============\n\n");
+            gaussSeidel(sistLin, solucao, &Seidel_t);
+            prnVetor(solucao, sistLin->n);
+            printf("Tempo: %lf\n\n", Seidel_t);
+
+            n_sistema++;
 
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
             //Medir o tempo de cada solução

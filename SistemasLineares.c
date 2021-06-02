@@ -40,6 +40,7 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     SistLinear_t * SL_copy = alocaSistLinear(SL->n);
     cpySist(SL_copy, SL);
 
+    double start_t = timestamp();
     for(int i=0; i<SL_copy->n; i++){
         iPivo = findMAX(SL_copy, i);
 
@@ -61,6 +62,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
     double tRetro = 0;
     retroSubst(SL_copy, x, &tRetro);
+
+    *tTotal = timestamp() - start_t;
 
     return 0;
 };
@@ -88,6 +91,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
 
     double soma;
     real_t it_error;
+    double start_t = timestamp();
     for(it_count=0; it_count< MAXIT; it_count++){
 
         for(int i=0; i< SL->n; i++){
@@ -107,11 +111,17 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
 
         //x_old receives x_new values
         cpyVector(x_old, x_new, SL->n);
-
     }
 
+    *tTotal = timestamp() - start_t;
     printf("Iterações para convergencia: %i\n", it_count + 1);
     cpyVector(x, x_new, SL->n);
+
+    //system did not converged
+    if(it_count >= MAXIT){
+        return -1;
+    }
+
     return 0;
 };
 
@@ -136,6 +146,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
     real_t * x_new = calloc(SL->n, sizeof(real_t));
 
     real_t soma, it_error;
+    double start_t = timestamp();
     for(it_count=0; it_count < MAXIT; it_count++){
         for(int i=0; i< SL->n; i++){
             soma = 0;
@@ -157,8 +168,15 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
         cpyVector(x_old, x_new, SL->n);
     }
 
+    *tTotal = timestamp() - start_t;
     printf("Total de iterações até convergencia %i\n", it_count + 1);
     cpyVector(x, x_new, SL->n);
+
+    //system did not converged
+    if(it_count >= MAXIT){
+        return -1;
+    }
+
     return 0;
 };
 
@@ -175,8 +193,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
           de iterações realizadas. Um nr. negativo indica um erro:
           -1 (não converge) -2 (sem solução)
   */
-int refinamento (SistLinear_t *SL, real_t *x, double *tTotal)
-{
+int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
 
 
 };

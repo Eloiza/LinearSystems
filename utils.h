@@ -7,7 +7,7 @@
 /*  Retorna tempo em milisegundos
 
     Forma de uso:
- 
+
     double tempo;
     tempo = timestamp();
     <trecho de programa do qual se deseja medir tempo>
@@ -17,4 +17,3 @@
 double timestamp(void);
 
 #endif // __UTILS_H__
-
