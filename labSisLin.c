@@ -13,14 +13,25 @@ int main (){
     SistLinear_t * sistLin;
     real_t * solution = malloc(sizeof(int)*3);
     double totalTime;
+    int n_sistema = 1;
     while(c != EOF){
         if(c != ' '){
             sistLin = lerSistLinear();
+            printf("Resolvendo Sistema %i\n", n_sistema);
             prnSistLinear(sistLin);
-            eliminacaoGauss(sistLin, solution, &totalTime);
-            printf("SOLUCAO:\n");
-            prnVetor(solution, sistLin->n);
 
+            //resolve sistema pela eliminacao de Gauss
+            eliminacaoGauss(sistLin, solution, &totalTime);
+            printf("Solução Gauss:\n");
+            prnVetor(solution, sistLin->n);
+            printf("\n");
+
+            printf("Depois de gauss\n");
+            prnSistLinear(sistLin);
+            printf("\n");
+
+
+            n_sistema++;
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
             //Medir o tempo de cada solução
             //Calcular norma L2 ou norma euclidiana do residuo de cada solucao

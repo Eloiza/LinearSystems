@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "SistemasLineares.h"
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 300
 
 
 void swapLine(SistLinear_t * SL, int i, int j){
@@ -81,6 +81,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     unsigned int iPivo; //stores the pivo index
     double m;
 
+    SistLinear_t copia = SL;
+
     for(int i=0; i<SL->n; i++){
         iPivo = findMAX(SL, i);
 
@@ -99,11 +101,9 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
             SL->b[k] = SL->b[k] - (SL->b[i] * m);
         }
     }
-    printf("\nAPÓS ELIMANCAO DE GAUSS\n");
-    prnSistLinear(SL);
 
-    // double tRetro = 0;
-    // retroSubst(SL, x, &tRetro);
+    double tRetro = 0;
+    retroSubst(SL, x, &tRetro);
 
     return 0;
 };
@@ -122,9 +122,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
           de iterações realizadas. Um nr. negativo indica um erro:
           -1 (não converge) -2 (sem solução)
 */
-int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal)
-{
-
+int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
+    for(int k=0; k< SL->n;)
 
 };
 
