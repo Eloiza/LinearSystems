@@ -29,10 +29,14 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res){
 
     //obtem o vetor residuo para a solução
     for(int i=0; i<SL->n; i++){
+        soma = 0;
         for(int j=0; j<SL->n; j++){
-            soma = SL->A[i][j] * x[j];
+            soma += SL->A[i][j] * x[j];
+            // printf("soma(%f) = A[%i][%i](%f) * x[%i](%f) \n", soma, i, j, SL->A[i][j], i, x[i]);
         }
         res[i] = SL->b[i] - soma;
+        // printf("res[%i] = b[%i](%f) - soma(%f)\n", i, i, SL->b[i], soma);
+        // printf("res[%i] = %f\n", i, res[i]);
     }
 
     //calcula a norma do vetor residuo
