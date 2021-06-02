@@ -123,8 +123,27 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
           -1 (não converge) -2 (sem solução)
 */
 int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
-    for(int k=0; k< SL->n;)
+    int k = 0;
+    for(k=0; k< MAXIT; k++){
+        for(int i=0; i< SL->n; i++){
 
+            //calculate the sum
+            for(int j=1; j != i; j++){
+                sum += SL->A[i][j]*x[j];
+            }
+            x[i]= 1/SL->A[i][i] * (SL->b[i] - sum);
+        }
+
+        if(max(x[i] de k+1 - x[i] de k) > SL->error){
+            x = x de k + 1;
+        }
+    }
+
+    if(k == MAXIT - 1){
+        return -1;
+    }
+
+    return 0;
 };
 
 /*!
