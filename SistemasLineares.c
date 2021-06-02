@@ -130,6 +130,13 @@ void cpyVector(real_t * destiny, real_t * source, int size){
         destiny[i] = source[i];
     }
 }
+
+void resetVector(real_t * vector,  int size){
+    for(int i=0; i<size; i++){
+        vector[i] = 0;
+    }
+}
+
 /*!
   \brief Método de Jacobi
 
@@ -154,7 +161,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
     double soma;
     real_t it_error;
     for(it_count=0; it_count< MAXIT; it_count++){
-        
+
         for(int i=0; i< SL->n; i++){
             soma = 0;
             for(int j=0; j<SL->n; j++){
@@ -194,10 +201,37 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
           de iterações realizadas. Um nr. negativo indica um erro:
           -1 (não converge) -2 (sem solução)
   */
-int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal)
-{
+int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
+    unsigned int it_count;
 
+    real_t * x_old = calloc(SL->n, sizeof(real_t));
+    real_t * x_new = calloc(SL->n, sizeof(real_t));
 
+    real_t soma, it_error;
+    for(it_count=0; it_count < MAXIT; it_count++){
+        for(int i=0; i< SL->n; i++){
+            soma = 0;
+            for(int j=0; j< i; j++){
+                soma += SL->A[i][j] * x_new[j];
+            }
+            for(int j= i+1; j< SL->n; j++){
+                soma += SL->A[i][j] * x_old[j];
+            }
+
+            x_new[i] = (SL->b[i] - soma) / SL->A[i][i];
+        }
+
+        it_error = calculateError(x_new, x_old, SL->n);
+        if(it_error <= SL->erro){
+            break;
+        }
+
+        cpyVector(x_old, x_new, SL->n);
+    }
+
+    printf("Total de iterações até convergencia %i\n", it_count + 1);
+    cpyVector(x, x_new, SL->n);
+    return 0;
 };
 
 

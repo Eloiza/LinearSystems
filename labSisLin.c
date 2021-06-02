@@ -8,7 +8,7 @@
 int main (){
     char c = 'a';
     SistLinear_t * sistLin;
-    double Jacobi_t;
+    double Gauss_t, Jacobi_t, Seidel_t;
     int n_sistema = 1;
     while(c != EOF){
         if(c != ' '){
@@ -25,11 +25,17 @@ int main (){
             //aloca memoria para vetor solucao
             real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
 
-            printf("Resolvendo com método de Jacobi\n");
-            gaussJacobi(sistLin, solucao, &Jacobi_t);
+            // printf("Resolvendo sistema com método de Jacobi\n");
+            // gaussJacobi(sistLin, solucao, &Jacobi_t);
+            // prnVetor(solucao, sistLin->n);
+            // printf("\n");
+
+            // resetVector(solucao, sistLin->n);
+            printf("Resolvendo sistema com método de Gauss Seidel\n");
+            gaussSeidel(sistLin, solucao, &Seidel_t);
             prnVetor(solucao, sistLin->n);
-            printf("\n");
             n_sistema++;
+
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
             //Medir o tempo de cada solução
             //Calcular norma L2 ou norma euclidiana do residuo de cada solucao
