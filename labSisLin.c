@@ -24,14 +24,13 @@ int main (){
             prnVetor(solucao, sistLin->n);
             printf("Tempo: %lf\n\n", Gauss_t);
 
-            //aloca memoria para vetor solucao
 
             printf("===============Gauss Jacobi==============\n\n");
             gaussJacobi(sistLin, solucao, &Jacobi_t);
             prnVetor(solucao, sistLin->n);
             printf("Tempo: %lf\n\n", Jacobi_t);
 
-            // resetVector(solucao, sistLin->n);
+
             printf("===============Gauss Seidel===============\n\n");
             gaussSeidel(sistLin, solucao, &Seidel_t);
             prnVetor(solucao, sistLin->n);
