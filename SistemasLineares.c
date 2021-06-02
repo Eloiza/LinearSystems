@@ -18,9 +18,32 @@
 
   \return Norma L2 do resíduo.
 */
-real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
-{
+real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res){
 
+    //se o vetor res não for fornecido, aloca memoria
+    if(!res){
+        res = malloc(sizeof(real_t)*SL->n);
+    }
+
+    real_t soma = 0;
+
+    //obtem o vetor residuo para a solução
+    for(int i=0; i<SL->n; i++){
+        for(int j=0; j<SL->n; j++){
+            soma = SL->A[i][j] * x[j];
+        }
+        res[i] = SL->b[i] - soma;
+    }
+
+    //calcula a norma do vetor residuo
+    real_t norma = 0;
+    for(int i=0; i< SL->n; i++){
+        norma += pow(res[i], 2);
+    }
+
+    norma = sqrt(norma);
+
+    return norma;
 };
 
 /*!
@@ -194,7 +217,6 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
           -1 (não converge) -2 (sem solução)
   */
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
-
 
 };
 

@@ -6,9 +6,12 @@
 #include "SistemasLineares.h"
 
 int main (){
-    char c = 'a';
-    SistLinear_t * sistLin;
     double Gauss_t, Jacobi_t, Seidel_t;
+    double Gauss_norm, Jacobi_norm, Seidel_norm;
+
+    SistLinear_t * sistLin;
+
+    char c = 'a';
     int n_sistema = 1;
     while(c != EOF){
         if(c != ' '){
@@ -24,24 +27,30 @@ int main (){
             prnVetor(solucao, sistLin->n);
             printf("Tempo: %lf\n\n", Gauss_t);
 
+            Gauss_norm = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %lf\n\n", Gauss_norm);
+
 
             printf("===============Gauss Jacobi==============\n\n");
             gaussJacobi(sistLin, solucao, &Jacobi_t);
             prnVetor(solucao, sistLin->n);
             printf("Tempo: %lf\n\n", Jacobi_t);
 
+            Jacobi_norm = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %lf\n\n", Jacobi_norm);
 
             printf("===============Gauss Seidel===============\n\n");
             gaussSeidel(sistLin, solucao, &Seidel_t);
             prnVetor(solucao, sistLin->n);
             printf("Tempo: %lf\n\n", Seidel_t);
 
+            Seidel_norm = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %lf\n\n", Seidel_norm);
+
             n_sistema++;
 
-            //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
-            //Medir o tempo de cada solução
-            //Calcular norma L2 ou norma euclidiana do residuo de cada solucao
-            //Aplicar Refinamento à solução obtida caso a norma L2 do resíduo seja maior que 5.0;
+            // Calcular a norma L2 (ou norma euclidiana) do resíduo de cada uma das soluções;
+            // Aplicar o método de Refinamento à solução obtida em cada um dos outros métodos caso a norma L2 do resíduo seja maior que 5.0;
 
             liberaSistLinear(sistLin);
         }
