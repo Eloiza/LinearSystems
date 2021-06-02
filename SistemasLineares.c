@@ -81,8 +81,6 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     unsigned int iPivo; //stores the pivo index
     double m;
 
-    SistLinear_t copia = SL;
-
     for(int i=0; i<SL->n; i++){
         iPivo = findMAX(SL, i);
 
@@ -108,6 +106,23 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     return 0;
 };
 
+real_t calculateError(real_t * a, real_t * b, int length){
+    real_t * result = malloc(sizeof(real_t)*length);
+
+    for(int i=0; i< length; i++){
+        result[i] = fabs(a[i] - b[i]);
+    }
+
+    real_t maior = 0;
+    //encontra o maior numero no vetor
+    for(int j=0; j< length; j++){
+        if(result[j] > maior){
+            maior = result[j];
+        }
+    }
+
+    return maior;
+}
 /*!
   \brief Método de Jacobi
 
@@ -123,26 +138,53 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
           -1 (não converge) -2 (sem solução)
 */
 int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
-    int k = 0;
-    for(k=0; k< MAXIT; k++){
+    unsigned int it_count = 0;
+
+    //allocate memory and set to 0
+    real_t * x_old = calloc(SL->n, sizeof(real_t));
+    real_t * x_new = calloc(SL->n, sizeof(real_t));
+
+    double soma;
+    real_t it_error;
+    for(it_count=0; it_count< MAXIT; it_count++){
+
+        printf("X_old: ");
+        prnVetor(x_old, SL->n);
+
+        printf("X_new: ");
+        prnVetor(x_new, SL->n);
+
+
         for(int i=0; i< SL->n; i++){
-
-            //calculate the sum
-            for(int j=1; j != i; j++){
-                sum += SL->A[i][j]*x[j];
+            soma = 0;
+            for(int j=0; j<SL->n; j++){
+                if(j != i){
+                    soma += (SL->A[i][j] * x_old[j]) / SL->A[i][i];
+                }
+                x_new[i] = (SL->b[i] / SL->A[i][i]) - soma;
             }
-            x[i]= 1/SL->A[i][i] * (SL->b[i] - sum);
         }
 
-        if(max(x[i] de k+1 - x[i] de k) > SL->error){
-            x = x de k + 1;
+        printf("X_old: ");
+        prnVetor(x_old, SL->n);
+
+        printf("X_new: ");
+        prnVetor(x_new, SL->n);
+
+        it_error = calculateError(x_new, x_old, SL->n);
+        printf("IT_ERROR: %f\n", it_error);
+        if(it_error <= SL->erro){
+            break;
         }
+
+        //x_old receives x_new values
+        memcpy(x_old, x_new, SL->n);
+
+        printf("Iterações para convergencia: %i\n", it_count);
     }
 
-    if(k == MAXIT - 1){
-        return -1;
-    }
 
+    x = x_new;
     return 0;
 };
 

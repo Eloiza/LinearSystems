@@ -6,13 +6,9 @@
 #include "SistemasLineares.h"
 
 int main (){
-    //allcoate memory for a  vector of linear systems
-    // SistLinear_t ** sistLin_v = (SistLinear_t **) malloc(sizeof(SistLinear_t));
-
     char c = 'a';
     SistLinear_t * sistLin;
-    real_t * solution = malloc(sizeof(int)*3);
-    double totalTime;
+    double Jacobi_t;
     int n_sistema = 1;
     while(c != EOF){
         if(c != ' '){
@@ -21,16 +17,18 @@ int main (){
             prnSistLinear(sistLin);
 
             //resolve sistema pela eliminacao de Gauss
-            eliminacaoGauss(sistLin, solution, &totalTime);
-            printf("Solução Gauss:\n");
-            prnVetor(solution, sistLin->n);
+            // eliminacaoGauss(sistLin, solution, &totalTime);
+            // printf("Solução Gauss:\n");
+            // prnVetor(solution, sistLin->n);
             printf("\n");
 
-            printf("Depois de gauss\n");
-            prnSistLinear(sistLin);
+            //aloca memoria para vetor solucao
+            real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
+
+            printf("Resolvendo com método de Jacobi\n");
+            gaussJacobi(sistLin, solucao, &Jacobi_t);
+            prnVetor(solucao, sistLin->n);
             printf("\n");
-
-
             n_sistema++;
             //Aplicar método de elimanacao de gauss com pivoteamento, Jacobi e Gauss-Seidel
             //Medir o tempo de cada solução
