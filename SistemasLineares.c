@@ -154,14 +154,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
     double soma;
     real_t it_error;
     for(it_count=0; it_count< MAXIT; it_count++){
-
-        printf("X_old: ");
-        prnVetor(x_old, SL->n);
-
-        printf("X_new: ");
-        prnVetor(x_new, SL->n);
-
-
+        
         for(int i=0; i< SL->n; i++){
             soma = 0;
             for(int j=0; j<SL->n; j++){
@@ -172,14 +165,7 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
             }
         }
 
-        printf("X_old: ");
-        prnVetor(x_old, SL->n);
-
-        printf("X_new: ");
-        prnVetor(x_new, SL->n);
-
         it_error = calculateError(x_new, x_old, SL->n);
-        printf("IT_ERROR: %f\n", it_error);
         if(it_error <= SL->erro){
             break;
         }
@@ -187,11 +173,10 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
         //x_old receives x_new values
         cpyVector(x_old, x_new, SL->n);
 
-        printf("Iterações para convergencia: %i\n", it_count);
     }
 
-
-    x = x_new;
+    printf("Iterações para convergencia: %i\n", it_count + 1);
+    cpyVector(x, x_new, SL->n);
     return 0;
 };
 
