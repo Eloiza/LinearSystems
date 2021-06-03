@@ -154,15 +154,9 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
     }
 
     *tTotal = timestamp() - start_t;
-    printf("Iterações para convergencia: %i\n", it_count + 1);
     cpyVector(x, x_new, SL->n);
 
-    //system did not converged
-    if(it_count >= MAXIT){
-        return -1;
-    }
-
-    return 0;
+    return it_count;
 };
 
 /*!
@@ -209,15 +203,10 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
     }
 
     *tTotal = timestamp() - start_t;
-    printf("Total de iterações até convergencia %i\n", it_count + 1);
+
     cpyVector(x, x_new, SL->n);
 
-    //system did not converged
-    if(it_count >= MAXIT){
-        return -1;
-    }
-
-    return 0;
+    return it_count;
 };
 
 
@@ -235,7 +224,7 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
   */
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
     //faz uma copia do sistema de entrada
-    SistLinear_t * SL_copy = malloc(sizeof(SistLinear_t));
+    SistLinear_t * SL_copy = alocaSistLinear(SL->n);
     cpySist(SL_copy, SL);
 
     real_t * w = calloc(SL_copy->n, sizeof(real_t));
@@ -244,7 +233,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
     real_t * x_old = calloc(SL_copy->n, sizeof(real_t));
     real_t * x_new = calloc(SL_copy->n, sizeof(real_t));
 
-    cpyVector(x_new, x);
+    cpyVector(x_new, x, SL_copy->n);
 
     int it_count = 0;
     double seidel_t, start_t = timestamp();
@@ -260,18 +249,18 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
         gaussSeidel(SL_copy, w, &seidel_t);
 
         //obter nova solucao x(i) + w
-        x_new = sumVector(x_old + w);
+        x_new = sumVector(x_old, w, SL_copy->n);
 
         //testar segundo criterio de parada
-        if(calculateError(x_old, x_new) <= SL_copy->erro){
+        if(calculateError(x_old, x_new, SL_copy->n) <= SL_copy->erro){
             break;
         }
 
         //x_old = x_new
-        cpyVector(x_old, x_new);
+        cpyVector(x_old, x_new, SL_copy->n);
     }
 
-    tTotal = start_t - timestamp();
+    *tTotal = timestamp() - start_t;
 
     return it_count;
 };

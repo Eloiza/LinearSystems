@@ -6,13 +6,12 @@
 #include "SistemasLineares.h"
 
 int main (){
-    double Gauss_t, Jacobi_t, Seidel_t;
-    double Gauss_norm, Jacobi_norm, Seidel_norm;
-
+    double Gauss_t, Jacobi_t, Seidel_t, ref_t, norma;
     SistLinear_t * sistLin;
 
     char c = 'a';
-    int n_sistema = 1;
+    int n_sistema = 1, it;
+
     while(c != EOF){
         if(c != ' '){
             sistLin = lerSistLinear();
@@ -25,32 +24,65 @@ int main (){
             printf("===========Eliminação de Gauss===========\n\n");
             eliminacaoGauss(sistLin, solucao, &Gauss_t);
             prnVetor(solucao, sistLin->n);
-            printf("Tempo: %lf\n\n", Gauss_t);
+            printf("Tempo: %lf\n", Gauss_t);
 
-            Gauss_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", Gauss_norm);
+            norma = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+            if(norma >= 5.0){
+                printf("===============Refinamento==============\n\n");
+                it = refinamento(sistLin, solucao, &ref_t);
+                prnVetor(solucao, sistLin->n);
+                printf("Iterações: %i\n", it);
+                printf("Tempo: %lf\n", ref_t);
+
+                norma = normaL2Residuo(sistLin, solucao, NULL);
+                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+            }
 
 
             printf("===============Gauss Jacobi==============\n\n");
-            gaussJacobi(sistLin, solucao, &Jacobi_t);
+            it = gaussJacobi(sistLin, solucao, &Jacobi_t);
             prnVetor(solucao, sistLin->n);
-            printf("Tempo: %lf\n\n", Jacobi_t);
+            printf("Iterações: %i\n", it);
+            printf("Tempo: %lf\n", Jacobi_t);
 
-            Jacobi_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", Jacobi_norm);
+            norma = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+            if(norma >= 5.0){
+                printf("===============Refinamento==============\n\n");
+                it = refinamento(sistLin, solucao, &ref_t);
+                prnVetor(solucao, sistLin->n);
+                printf("Iterações: %i\n", it);
+                printf("Tempo: %lf\n", ref_t);
+
+                norma = normaL2Residuo(sistLin, solucao, NULL);
+                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+            }
+
 
             printf("===============Gauss Seidel===============\n\n");
-            gaussSeidel(sistLin, solucao, &Seidel_t);
+            it = gaussSeidel(sistLin, solucao, &Seidel_t);
             prnVetor(solucao, sistLin->n);
-            printf("Tempo: %lf\n\n", Seidel_t);
+            printf("Iterações: %i\n", it);
+            printf("Tempo: %lf\n", Seidel_t);
 
-            Seidel_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", Seidel_norm);
+            norma = normaL2Residuo(sistLin, solucao, NULL);
+            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+            if(norma >= 5.0){
+                printf("===============Refinamento==============\n\n");
+                it = refinamento(sistLin, solucao, &ref_t);
+                prnVetor(solucao, sistLin->n);
+                printf("Iterações: %i\n", it);
+                printf("Tempo: %lf\n", ref_t);
+
+                norma = normaL2Residuo(sistLin, solucao, NULL);
+                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+            }
 
             n_sistema++;
-
-            // Calcular a norma L2 (ou norma euclidiana) do resíduo de cada uma das soluções;
-            // Aplicar o método de Refinamento à solução obtida em cada um dos outros métodos caso a norma L2 do resíduo seja maior que 5.0;
 
             liberaSistLinear(sistLin);
         }

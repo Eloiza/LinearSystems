@@ -1,5 +1,9 @@
 #include "SistemasLineares.h"
 
+/*Soma dois vetores de mesmo tamanho. O resultado é guardado em
+um terceiro vetor de mesmo tipo*/
+real_t * sumVector(real_t * a, real_t * b, unsigned int size);
+
 /*Copia os elementos de source para o vetor destiny.
 Os vetores precisam ter o mesmo tamanho*/
 void cpyVector(real_t * destiny, real_t * source, int size);
