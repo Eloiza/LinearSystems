@@ -2,6 +2,14 @@
 #include <math.h>
 #include <stdlib.h>
 
+real_t * sumVector(real_t * a, real_t * b, unsigned int size){
+    real_t * sum = malloc(sizeof(real_t)*size);
+    for(int i=0; i<size; i++){
+        sum[i] = a[i] + b[i];
+    }
+
+    return sum;
+}
 /*Copia os elementos de source para o vetor destiny.
 Os vetores precisam ter o mesmo tamanho*/
 void cpyVector(real_t * destiny, real_t * source, int size){

@@ -97,8 +97,6 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
             SL_copy->b[k] = SL_copy->b[k] - (SL_copy->b[i] * m);
         }
 
-        prnSistLinear(SL_copy);
-
     }
 
     prnSistLinear(SL_copy);
@@ -236,7 +234,46 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
           -1 (não converge) -2 (sem solução)
   */
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
+    //faz uma copia do sistema de entrada
+    SistLinear_t * SL_copy = malloc(sizeof(SistLinear_t));
+    cpySist(SL_copy, SL);
 
+    real_t * w = calloc(SL_copy->n, sizeof(real_t));
+    real_t * r = calloc(SL_copy->n, sizeof(real_t));
+
+    real_t * x_old = calloc(SL_copy->n, sizeof(real_t));
+    real_t * x_new = calloc(SL_copy->n, sizeof(real_t));
+
+    cpyVector(x_new, x);
+
+    int it_count = 0;
+    double seidel_t, start_t = timestamp();
+    for(it_count=0; it_count<MAXIT; it_count++){
+
+        //calcular residuo e testa primeira condicao de parada
+        if(normaL2Residuo(SL_copy, x_new, r) <= SL_copy->erro){
+            break;
+        }
+
+        //obter w resolvendo AW = r
+        SL_copy->b = r;
+        gaussSeidel(SL_copy, w, &seidel_t);
+
+        //obter nova solucao x(i) + w
+        x_new = sumVector(x_old + w);
+
+        //testar segundo criterio de parada
+        if(calculateError(x_old, x_new) <= SL_copy->erro){
+            break;
+        }
+
+        //x_old = x_new
+        cpyVector(x_old, x_new);
+    }
+
+    tTotal = start_t - timestamp();
+
+    return it_count;
 };
 
 /*!
@@ -369,7 +406,7 @@ SistLinear_t *lerSistLinear (){
 // Exibe SL na saída padrão
 void prnSistLinear (SistLinear_t *SL){
     int i;
-    printf("n: %d \nerro: %lf \n", SL->n, SL->erro);
+    printf("n: %d \nerro: %1.9e \n", SL->n, SL->erro);
 
     // print the independet terms vector
     printf("b: ");
@@ -390,10 +427,10 @@ void prnVetor (real_t *v, unsigned int n){
     for(i=0; i<n; i++){
         //case last position
         if(i == n - 1){
-            printf("%lf ", v[i]);
+            printf("%1.9e ", v[i]);
 
         }else{
-            printf("%lf, ", v[i]);
+            printf("%1.9e, ", v[i]);
         }
     }
     printf("\n");
