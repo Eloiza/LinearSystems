@@ -41,25 +41,46 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
         for(int k= i+1; k< SL->n; k++){
             if(!SL->A[i][i]){
-                fprintf(stderr, "%s", "eliminacaoGauss - Division by 0\n");
-                //sem solucao
+                fprintf(stderr, "%s", "eliminacaoGauss - Divisão por 0\n");
+                *tTotal = timestamp() - start_t;
                 return -2;
             }
 
             m = SL->A[k][i] / SL->A[i][i];
 
+            if(!isfinite(m)){
+                fprintf(stderr, "%s%lf\n", "eliminacaoGauss - multiplicador m é ", m);
+                *tTotal = timestamp() - start_t;
+                return -2;
+            }
+
             SL->A[k][i] = 0;
             for(int j= i+1; j<SL->n; j++){
                 SL->A[k][j] = SL->A[k][j] - (SL->A[i][j] * m);
+
+                if(!isfinite(SL->A[k][j])){
+                    fprintf(stderr, "%s%i%s%i%s%lf\n", "eliminacaoGauss - SL->A[",k,"][",j,"] é ", SL->A[k][j]);
+                    *tTotal = timestamp() - start_t;
+                    return -2;
+                }
+
             }
 
             SL->b[k] = SL->b[k] - (SL->b[i] * m);
+
+            if(!isfinite(SL->b[k])){
+                fprintf(stderr, "%s%i%s%lf\n", "eliminacaoGauss - SL->b[",k ,"] é",SL->b[k]);
+                *tTotal = timestamp() - start_t;
+                return -2;
+            }
+
         }
 
     }
 
     //determina se sistema é possive, impossivel, indeterminado
     if(sistemaIndeterminado(SL) || sistemaImpossivel(SL)){
+        *tTotal = timestamp() - start_t;
         return -2;
     }
 
@@ -96,18 +117,42 @@ int gaussJacobi (SistLinear_t *SL, real_t *x, double *tTotal){
     real_t it_error;
     double start_t = timestamp();
     for(it_count=0; it_count< MAXIT; it_count++){
-
         for(int i=0; i< SL->n; i++){
             soma = 0;
             for(int j=0; j<SL->n; j++){
                 if(j != i){
+
+                    if(SL->A[i][i] == 0){
+                        fprintf(stderr, "%s\n", "gaussJacobi - Divisão por 0");
+                        *tTotal = timestamp() - start_t;
+                        return -2;
+                    }
+
                     soma += (SL->A[i][j] * x_old[j]) / SL->A[i][i];
+
+                    if(!isfinite(soma)){
+                        fprintf(stderr, "%s%lf\n", "gaussJacobi - Variavel soma é ",soma);
+                        *tTotal = timestamp() - start_t;
+                        return -2;
+                    }
                 }
                 x_new[i] = (SL->b[i] / SL->A[i][i]) - soma;
+
+                if(!isfinite(x_new[i])){
+                    fprintf(stderr, "%s%i%s%lf\n", "gaussJacobi - Variavel x_new[", i,"] é ", x_new[i]);
+                    *tTotal = timestamp() - start_t;
+                    return -2;
+                }
             }
         }
 
         it_error = calculateError(x_new, x_old, SL->n);
+        if(!isfinite(it_error)){
+            fprintf(stderr, "%s%lf\n", "gaussJacobi - Variavel it_error é ", it_error);
+            *tTotal = timestamp() - start_t;
+            return -2;
+        }
+
         if(it_error <= SL->erro){
             break;
         }
@@ -149,15 +194,46 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
             soma = 0;
             for(int j=0; j< i; j++){
                 soma += SL->A[i][j] * x_new[j];
+
+                if(!isfinite(soma)){
+                    fprintf(stderr, "%s%lf\n", "gaussSeidel - Variavel soma é", soma);
+                    *tTotal = timestamp() - start_t;
+                    return -2;
+                }
             }
+
             for(int j= i+1; j< SL->n; j++){
                 soma += SL->A[i][j] * x_old[j];
+                if(!isfinite(soma)){
+                    fprintf(stderr, "%s%lf\n", "gaussSeidel - Variavel soma é", soma);
+                    *tTotal = timestamp() - start_t;
+                    return -2;
+                }
+            }
+
+            if(!isfinite(SL->A[i][i])){
+                fprintf(stderr, "%s\n", "gaussSeidel - Divisão por 0");
+                *tTotal = timestamp() - start_t;
+                return -2;
             }
 
             x_new[i] = (SL->b[i] - soma) / SL->A[i][i];
+
+            if(!isfinite(x_new[i])){
+                fprintf(stderr, "%s%i%s%lf\n", "gaussSeidel - Variavel x_new[",i,"] é ", x_new[i]);
+                *tTotal = timestamp() - start_t;
+                return -2;
+            }
+
         }
 
         it_error = calculateError(x_new, x_old, SL->n);
+        if(!isfinite(it_error)){
+            fprintf(stderr, "%s%lf\n", "gaussSeidel - Variavel it_error é", it_error);
+            *tTotal = timestamp() - start_t;
+            return -2;
+        }
+
         if(it_error <= SL->erro){
             break;
         }
@@ -195,11 +271,14 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res){
         soma = 0;
         for(int j=0; j<SL->n; j++){
             soma += SL->A[i][j] * x[j];
-            // printf("soma(%f) = A[%i][%i](%f) * x[%i](%f) \n", soma, i, j, SL->A[i][j], i, x[i]);
+
+            if(!isfinite(soma)){
+                fprintf(stderr, "%s%lf\n", "normaL2Residuo - Variavel soma é ", soma);
+                return -2;
+            }
+
         }
         res[i] = SL->b[i] - soma;
-        // printf("res[%i] = b[%i](%f) - soma(%f)\n", i, i, SL->b[i], soma);
-        // printf("res[%i] = %f\n", i, res[i]);
     }
 
     //calcula a norma do vetor residuo
@@ -245,8 +324,6 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
 
         //calcular residuo e testa primeira condicao de parada
         norma = normaL2Residuo(SL, x_new, r);
-        // printf("residuo: ");
-        prnVetor(r, SL->n);
 
         // printf("norma (%1.9e) <= erro(%1.9e)\n", norma, SL->erro);
         if(norma <= SL->erro){
@@ -256,8 +333,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
         //obter w resolvendo AW = r
         // SL->b = r;
         cpyVector(SL->b, r, SL->n);
-        // prnVetor(r, SL->n);
-        // prnSistLinear(SL);
+
         eliminacaoGauss(SL, w, &gauss_t);
 
         //obter nova solucao x(i) + w
@@ -265,7 +341,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
 
         //testar segundo criterio de parada
         it_erro = calculateError(x_old, x_new, SL->n);
-        // printf("it_erro (%1.9e) <= erro(%1.9e) \n",it_erro, SL->erro);
+
         if(calculateError(x_old, x_new, SL->n) <= SL->erro){
             break;
         }
@@ -372,6 +448,10 @@ SistLinear_t *lerSistLinear (){
     getchar();
 
     SistLinear_t * sistLin = alocaSistLinear(n);
+    if(!sistLin){
+        return NULL;
+    }
+
     sistLin->erro = error;
 
     char buffer[BUFFER_SIZE];

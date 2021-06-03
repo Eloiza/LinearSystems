@@ -46,9 +46,9 @@ int sistemaImpossivel(SistLinear_t * SL){
 }
 
 void prnSolucao(real_t * solucao, int n, double norma){
-    printf("--> X:");
-    prnVetor(solucao, sistLin->n);
-    printf("--> Norma L2 do residuo: %lf\n\n", norma);
+    printf("\t--> X:");
+    prnVetor(solucao, n);
+    printf("\t--> Norma L2 do residuo: %1.9e\n\n", norma);
 }
 
 real_t * sumVector(real_t * a, real_t * b, unsigned int size){
