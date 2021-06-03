@@ -28,7 +28,7 @@ int main (){
             printf("Tempo: %lf\n\n", Gauss_t);
 
             Gauss_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %lf\n\n", Gauss_norm);
+            printf("Norma L2 do residuo: f:%1.9e\n\n", Gauss_norm);
 
 
             printf("===============Gauss Jacobi==============\n\n");
@@ -37,7 +37,7 @@ int main (){
             printf("Tempo: %lf\n\n", Jacobi_t);
 
             Jacobi_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %lf\n\n", Jacobi_norm);
+            printf("Norma L2 do residuo: f:%1.9e\n\n", Jacobi_norm);
 
             printf("===============Gauss Seidel===============\n\n");
             gaussSeidel(sistLin, solucao, &Seidel_t);
@@ -45,7 +45,7 @@ int main (){
             printf("Tempo: %lf\n\n", Seidel_t);
 
             Seidel_norm = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %lf\n\n", Seidel_norm);
+            printf("Norma L2 do residuo: f:%1.9e\n\n", Seidel_norm);
 
             n_sistema++;
 

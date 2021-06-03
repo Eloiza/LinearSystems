@@ -69,13 +69,24 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
     double start_t = timestamp();
     for(int i=0; i<SL_copy->n; i++){
-        iPivo = findMAX(SL_copy, i);
+        iPivo = findMAX(SL_copy, i, i);
 
-        if(i != iPivo){
+        //case pivo = 0 go to next iteration
+        if(!SL->A[iPivo][i]){
+            continue;
+
+        }else if(i != iPivo){
             swapLine(SL_copy, i, iPivo);
+            printf("Troquei linha %i com linha %i\n", i, iPivo);
+            prnSistLinear(SL_copy);
         }
 
         for(int k= i+1; k< SL_copy->n; k++){
+            if(!SL_copy->A[i][i]){
+                fprintf(stderr, "%s", "Gauss Elimination - Division by 0\n");
+                return 1;
+            }
+
             m = SL_copy->A[k][i] / SL_copy->A[i][i];
 
             SL_copy->A[k][i] = 0;
@@ -85,8 +96,12 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
 
             SL_copy->b[k] = SL_copy->b[k] - (SL_copy->b[i] * m);
         }
+
+        prnSistLinear(SL_copy);
+
     }
 
+    prnSistLinear(SL_copy);
     double tRetro = 0;
     retroSubst(SL_copy, x, &tRetro);
 
@@ -234,7 +249,8 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
 SistLinear_t* alocaSistLinear (unsigned int n){
     SistLinear_t * sistLin = malloc(sizeof(SistLinear_t));
     if(!sistLin){
-        printf("Error to alocate memory for sistLinear_t\n");
+        fprintf(stderr, "%s", "Error to alocate memory for sistLinear_t\n");
+        return NULL;
     }
     sistLin->n = n;
     sistLin->erro = 0;
@@ -243,14 +259,14 @@ SistLinear_t* alocaSistLinear (unsigned int n){
     //case of error in memory allocation
     if(!sistLin->b){
         fprintf(stderr, "%s", "Error to allocate memory for vector b!\n");
-        exit(-1);
+        return NULL;
     }
 
     sistLin->A = malloc(sizeof(real_t*)*n);
 
     if(!sistLin->A){
         fprintf(stderr, "%s", "Error to allocate memory for vector A!\n");
-        exit(-1);
+        return NULL;
     }
 
     for(int i=0; i<n; i++){
@@ -258,7 +274,7 @@ SistLinear_t* alocaSistLinear (unsigned int n){
 
         if(!sistLin->A[i]){
             fprintf(stderr, "%s", "Error to allocate memory for vector A!\n");
-            exit(-1);
+            return NULL;
         }
 
     }

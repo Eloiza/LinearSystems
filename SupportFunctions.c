@@ -63,11 +63,11 @@ int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal){
 };
 
 /*Encontra maior valor em dada coluna da matriz A do sistema SL*/
-unsigned int findMAX(SistLinear_t *SL, unsigned int col){
-    real_t max_value = SL->A[0][col];
-    unsigned int max_index = 0;
+unsigned int findMAX(SistLinear_t *SL, unsigned int lin, unsigned int col){
+    real_t max_value = SL->A[lin][col];
+    unsigned int max_index = lin;
 
-    for(int i=0; i< SL->n; i++){
+    for(int i=lin; i< SL->n; i++){
         if(fabs(SL->A[i][col]) > fabs(max_value)){
             max_value = SL->A[i][col];
             max_index = i;

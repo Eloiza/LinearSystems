@@ -21,7 +21,7 @@ dos termos.*/
 int retroSubst(SistLinear_t *SL, real_t * x, double * tTotal);
 
 /*Encontra maior valor em dada coluna da matriz A do sistema SL*/
-unsigned int findMAX(SistLinear_t *SL, unsigned int col);
+unsigned int findMAX(SistLinear_t *SL, unsigned int lin, unsigned int col);
 
 /*Calula o erro absoluto entre dois vetores. Essa função é utilizada
 nos métodos Gauss Jacobi e Gauss Seidel*/
