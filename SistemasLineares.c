@@ -42,7 +42,8 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
         for(int k= i+1; k< SL->n; k++){
             if(!SL->A[i][i]){
                 fprintf(stderr, "%s", "eliminacaoGauss - Division by 0\n");
-                return 1;
+                //sem solucao
+                return -2;
             }
 
             m = SL->A[k][i] / SL->A[i][i];
@@ -55,6 +56,11 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
             SL->b[k] = SL->b[k] - (SL->b[i] * m);
         }
 
+    }
+
+    //determina se sistema é possive, impossivel, indeterminado
+    if(sistemaIndeterminado(SL) || sistemaImpossivel(SL)){
+        return -2;
     }
 
     double tRetro = 0;

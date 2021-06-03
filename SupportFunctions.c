@@ -3,12 +3,52 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void prnSolucao(real_t * solucao, int n, double tempo, int iteracoes, double norma){
-    printf("X: ");
-    prnVetor(solucao, n);
-    printf("Tempo: %lf\n", tempo);
-    printf("Iterações: %i\n", iteracoes);
-    printf("Norma L2 do residuo: %1.9e\n\n", norma);
+int sistemaIndeterminado(SistLinear_t * SL){
+    //uma linha igual a zero
+    int termosZero = 0;
+    for(int i=0; i< SL->n; i++){
+        termosZero = 0;
+        for(int j=0; j< SL->n; j++){
+            if(SL->A[i][j] == 0){
+                termosZero++;
+            }
+        }
+
+        if(termosZero >= SL->n){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+int sistemaImpossivel(SistLinear_t * SL){
+    //linha todos os coeficientes = 0, vetor b != 0
+    int termosZero = 0;
+    for(int i=0; i< SL->n; i++){
+        for(int j=0; j< SL->n; j++){
+            if(SL->A[i][j] == 0){
+                termosZero++;
+            }
+        }
+    }
+
+    //checa se toda a matriz é igual a 0
+    if(termosZero >= SL->n*SL->n){
+        for(int i=0; i< SL->n; i++){
+            if(SL->b[i] != 0){
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+void prnSolucao(real_t * solucao, int n, double norma){
+    printf("--> X:");
+    prnVetor(solucao, sistLin->n);
+    printf("--> Norma L2 do residuo: %lf\n\n", norma);
 }
 
 real_t * sumVector(real_t * a, real_t * b, unsigned int size){

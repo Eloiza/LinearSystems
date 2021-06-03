@@ -16,26 +16,20 @@ int main (){
     while(c != EOF){
         if(c != ' '){
             sistLin = lerSistLinear();
-            printf(">>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<\n");
-            printf(">>>>>>>>>>>>>>>Resolvendo Sistema %i<<<<<<<<<<<<<<<\n", n_sistema);
-            printf(">>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<\n\n");
-
-            // prnSistLinear(sistLin);
-
+            printf("***** Sistema %i --> n = %i, erro %f\n", n_sistema, sistLin->n, sistLin->erro);
             real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
             sist_copy = alocaSistLinear(sistLin->n);
             cpySist(sist_copy, sistLin);
 
             //resolve sistema pela eliminacao de Gauss
-            printf("===========Eliminação de Gauss===========\n\n");
-            eliminacaoGauss(sist_copy, solucao, &Gauss_t);
+            it = eliminacaoGauss(sist_copy, solucao, &Gauss_t);
             norma = normaL2Residuo(sistLin, solucao, NULL);
-            prnSolucao(solucao, sistLin->n, Gauss_t, it, norma);
+            printf("===>Eliminação de Gauss: %lf\n", Gauss_t);
+            printf("--> X:");
+            prnVetor(solucao, sistLin->n);
+            printf("--> Norma L2 do residuo: %lf\n\n", norma);
 
             if(norma >= 5.0){
-                printf("===============Refinamento==============\n\n");
-                //reseta sist_copy
-                // cpySist(sist_copy, sistLin);
 
                 //aplica metodo de refinamento
                 it = refinamento(sist_copy, solucao, &ref_t);
@@ -43,39 +37,38 @@ int main (){
                 //calcula a norma para a nova solucao encontrada
                 norma = normaL2Residuo(sistLin, solucao, NULL);
 
-                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
+                printf("===>Refinamento: %lf -> %i iteracoes\n", ref_t, it);
+                prnSolucao(solucao, sistLin->n, norma);
             }
 
-            printf("===============Gauss Jacobi==============\n\n");
 
             it = gaussJacobi(sistLin, solucao, &Jacobi_t);
             norma = normaL2Residuo(sistLin, solucao, NULL);
 
-            prnSolucao(solucao, sistLin->n, Jacobi_t, it, norma);
+            printf("===>Gauss Jacobi: lf --> %i iteracoes\n", Jacobi_t, it);
+            prnSolucao(solucao, sistLin->n, norma);
 
             if(norma >= 5.0){
-                printf("===============Refinamento==============\n\n");
                 //reseta sist_copy
                 cpySist(sist_copy, sistLin);
 
                 it = refinamento(sist_copy, solucao, &ref_t);
                 norma = normaL2Residuo(sistLin, solucao, NULL);
 
-                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
+                printf("===>Refinamento: %lf --> %i iteracoes\n", ref_t, it);
+                prnSolucao(solucao, sistLin->n, norma);
             }
 
-
-            printf("===============Gauss Seidel===============\n\n");
-
+            //Resolve sistema com metodo gauss-seidel
             it = gaussSeidel(sistLin, solucao, &Seidel_t);
 
             //calcula norma da solucao
             norma = normaL2Residuo(sistLin, solucao, NULL);
 
-            prnSolucao(solucao, sistLin->n, Seidel_t, it, norma);
+            printf("===>Gauss Seidel: lf --> %i iteracoes \n", Seidel_t, it);
+            prnSolucao(solucao, sistLin->n, norma);
 
             if(norma >= 5.0){
-                printf("===============Refinamento==============\n\n");
                 //reseta sist_copy
                 cpySist(sist_copy, sistLin);
 
@@ -84,7 +77,8 @@ int main (){
                 //cacula a norma para a nova solucao
                 norma = normaL2Residuo(sistLin, solucao, NULL);
 
-                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
+                printf("===>Refinamento: %lf --> %i iteracoes\n", ref_t, it);
+                prnSolucao(solucao, sistLin->n, it, norma);
             }
 
             n_sistema++;

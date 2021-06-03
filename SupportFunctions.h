@@ -1,8 +1,14 @@
 #include "SistemasLineares.h"
 
+/*Verifica se um sistema linear é importssivel. Retorna 1 caso sim, se não retona 0*/
+int sistemaImpossivel(SistLinear_t * SL);
+
+/*Verifica se um sistema linear é indeterminado. Retorna 1 caso sim, se não retorna 0*/
+int sistemaIndeterminado(SistLinear_t * SL);
+
 /*Escreve na tela a soluação encontrada e informações sobre a execucao
 dos métodos*/
-void prnSolucao(real_t * solucao, int n, double tempo, int iteracoes, double norma);
+void prnSolucao(real_t * solucao, int n, double norma);
 
 /*Soma dois vetores de mesmo tamanho. O resultado é guardado em
 um terceiro vetor de mesmo tipo*/
