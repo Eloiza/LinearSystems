@@ -1,10 +1,11 @@
     CC     = gcc -g -std=c11
-    CFLAGS = 
+    CFLAGS =
     LFLAGS = -lm
 
-      PROG = labSisLin 
+      PROG = labSisLin
       OBJS = utils.o \
-             SistemasLineares.o
+             SistemasLineares.o \
+			 SupportFunctions.o
 
 .PHONY: limpa faxina clean purge all
 
@@ -20,4 +21,3 @@ limpa clean:
 faxina purge:   limpa
 	@rm -f *.o core a.out
 	@rm -f $(PROG)
-
