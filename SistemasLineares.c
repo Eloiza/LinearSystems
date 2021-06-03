@@ -227,32 +227,39 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
     real_t * x_old = calloc(SL->n, sizeof(real_t));
     real_t * x_new = calloc(SL->n, sizeof(real_t));
 
+    int it_count = 0;
+    double gauss_t, start_t = timestamp();
+    real_t norma, it_erro;
+
+    //obtem um sistema escalonado
+    eliminacaoGauss(SL, x, &gauss_t);
     cpyVector(x_new, x, SL->n);
 
-    int it_count = 0;
-    double seidel_t, start_t = timestamp();
-    real_t norma, it_erro;
     for(it_count=0; it_count<MAXIT; it_count++){
 
         //calcular residuo e testa primeira condicao de parada
         norma = normaL2Residuo(SL, x_new, r);
-        // printf("norma (%lf) <= erro(%lf)\n", norma, SL->erro);
+        // printf("residuo: ");
+        prnVetor(r, SL->n);
+
+        // printf("norma (%1.9e) <= erro(%1.9e)\n", norma, SL->erro);
         if(norma <= SL->erro){
             break;
         }
 
         //obter w resolvendo AW = r
-        SL->b = r;
+        // SL->b = r;
+        cpyVector(SL->b, r, SL->n);
         // prnVetor(r, SL->n);
         // prnSistLinear(SL);
-        eliminacaoGauss(SL, w, &seidel_t);
+        eliminacaoGauss(SL, w, &gauss_t);
 
         //obter nova solucao x(i) + w
         x_new = sumVector(x_old, w, SL->n);
 
         //testar segundo criterio de parada
         it_erro = calculateError(x_old, x_new, SL->n);
-        // printf("it_erro (%lf) <= erro(%lf) \n",it_erro, SL->erro);
+        // printf("it_erro (%1.9e) <= erro(%1.9e) \n",it_erro, SL->erro);
         if(calculateError(x_old, x_new, SL->n) <= SL->erro){
             break;
         }
@@ -265,7 +272,7 @@ int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
 
     cpyVector(x, x_new, SL->n);
 
-    return it_count;
+    return it_count + 1;
 };
 
 /*!

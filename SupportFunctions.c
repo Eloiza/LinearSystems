@@ -95,7 +95,7 @@ unsigned int findMAX(SistLinear_t *SL, unsigned int lin, unsigned int col){
 }
 
 /*Calula o erro absoluto entre dois vetores. Essa função é utilizada
-nos métodos Gauss Jacobi e Gauss Seidel*/
+nos métodos Gauss Jacobi e Gauss Seidel. Calcula max(|xi - xi+1|)*/
 real_t calculateError(real_t * a, real_t * b, int length){
     real_t * result = malloc(sizeof(real_t)*length);
 

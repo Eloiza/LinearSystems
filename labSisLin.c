@@ -16,8 +16,11 @@ int main (){
     while(c != EOF){
         if(c != ' '){
             sistLin = lerSistLinear();
-            printf(">>>>>>>>>>Resolvendo Sistema %i<<<<<<<<<<\n", n_sistema);
-            prnSistLinear(sistLin);
+            printf(">>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<\n");
+            printf(">>>>>>>>>>>>>>>Resolvendo Sistema %i<<<<<<<<<<<<<<<\n", n_sistema);
+            printf(">>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+
+            // prnSistLinear(sistLin);
 
             real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
             sist_copy = alocaSistLinear(sistLin->n);
@@ -32,7 +35,7 @@ int main (){
             if(norma >= 5.0){
                 printf("===============Refinamento==============\n\n");
                 //reseta sist_copy
-                cpySist(sist_copy, sistLin);
+                // cpySist(sist_copy, sistLin);
 
                 //aplica metodo de refinamento
                 it = refinamento(sist_copy, solucao, &ref_t);
