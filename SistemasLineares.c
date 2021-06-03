@@ -9,46 +9,6 @@
 
 #define BUFFER_SIZE 300
 
-/*!
-  \brief Essa função calcula a norma L2 do resíduo de um sistema linear
-
-  \param SL Ponteiro para o sistema linear
-  \param x Solução do sistema linear
-  \param res Valor do resíduo
-
-  \return Norma L2 do resíduo.
-*/
-real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res){
-
-    //se o vetor res não for fornecido, aloca memoria
-    if(!res){
-        res = malloc(sizeof(real_t)*SL->n);
-    }
-
-    real_t soma = 0;
-
-    //obtem o vetor residuo para a solução
-    for(int i=0; i<SL->n; i++){
-        soma = 0;
-        for(int j=0; j<SL->n; j++){
-            soma += SL->A[i][j] * x[j];
-            // printf("soma(%f) = A[%i][%i](%f) * x[%i](%f) \n", soma, i, j, SL->A[i][j], i, x[i]);
-        }
-        res[i] = SL->b[i] - soma;
-        // printf("res[%i] = b[%i](%f) - soma(%f)\n", i, i, SL->b[i], soma);
-        // printf("res[%i] = %f\n", i, res[i]);
-    }
-
-    //calcula a norma do vetor residuo
-    real_t norma = 0;
-    for(int i=0; i< SL->n; i++){
-        norma += pow(res[i], 2);
-    }
-
-    norma = sqrt(norma);
-
-    return norma;
-};
 
 /*!
   \brief Método da Eliminação de Gauss
@@ -64,44 +24,41 @@ int eliminacaoGauss (SistLinear_t *SL, real_t *x, double *tTotal){
     unsigned int iPivo; //stores the pivo index
     double m;
 
-    SistLinear_t * SL_copy = alocaSistLinear(SL->n);
-    cpySist(SL_copy, SL);
+    // SistLinear_t * SL_copy = alocaSistLinear(SL->n);
+    // cpySist(SL_copy, SL);
 
     double start_t = timestamp();
-    for(int i=0; i<SL_copy->n; i++){
-        iPivo = findMAX(SL_copy, i, i);
+    for(int i=0; i<SL->n; i++){
+        iPivo = findMAX(SL, i, i);
 
         //case pivo = 0 go to next iteration
         if(!SL->A[iPivo][i]){
             continue;
 
         }else if(i != iPivo){
-            swapLine(SL_copy, i, iPivo);
-            printf("Troquei linha %i com linha %i\n", i, iPivo);
-            prnSistLinear(SL_copy);
+            swapLine(SL, i, iPivo);
         }
 
-        for(int k= i+1; k< SL_copy->n; k++){
-            if(!SL_copy->A[i][i]){
-                fprintf(stderr, "%s", "Gauss Elimination - Division by 0\n");
+        for(int k= i+1; k< SL->n; k++){
+            if(!SL->A[i][i]){
+                fprintf(stderr, "%s", "eliminacaoGauss - Division by 0\n");
                 return 1;
             }
 
-            m = SL_copy->A[k][i] / SL_copy->A[i][i];
+            m = SL->A[k][i] / SL->A[i][i];
 
-            SL_copy->A[k][i] = 0;
-            for(int j= i+1; j<SL_copy->n; j++){
-                SL_copy->A[k][j] = SL_copy->A[k][j] - (SL_copy->A[i][j] * m);
+            SL->A[k][i] = 0;
+            for(int j= i+1; j<SL->n; j++){
+                SL->A[k][j] = SL->A[k][j] - (SL->A[i][j] * m);
             }
 
-            SL_copy->b[k] = SL_copy->b[k] - (SL_copy->b[i] * m);
+            SL->b[k] = SL->b[k] - (SL->b[i] * m);
         }
 
     }
 
-    prnSistLinear(SL_copy);
     double tRetro = 0;
-    retroSubst(SL_copy, x, &tRetro);
+    retroSubst(SL, x, &tRetro);
 
     *tTotal = timestamp() - start_t;
 
@@ -209,6 +166,47 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
     return it_count;
 };
 
+/*!
+  \brief Essa função calcula a norma L2 do resíduo de um sistema linear
+
+  \param SL Ponteiro para o sistema linear
+  \param x Solução do sistema linear
+  \param res Valor do resíduo
+
+  \return Norma L2 do resíduo.
+*/
+real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res){
+
+    //se o vetor res não for fornecido, aloca memoria
+    if(!res){
+        res = malloc(sizeof(real_t)*SL->n);
+    }
+
+    real_t soma = 0;
+
+    //obtem o vetor residuo para a solução
+    for(int i=0; i<SL->n; i++){
+        soma = 0;
+        for(int j=0; j<SL->n; j++){
+            soma += SL->A[i][j] * x[j];
+            // printf("soma(%f) = A[%i][%i](%f) * x[%i](%f) \n", soma, i, j, SL->A[i][j], i, x[i]);
+        }
+        res[i] = SL->b[i] - soma;
+        // printf("res[%i] = b[%i](%f) - soma(%f)\n", i, i, SL->b[i], soma);
+        // printf("res[%i] = %f\n", i, res[i]);
+    }
+
+    //calcula a norma do vetor residuo
+    real_t norma = 0;
+    for(int i=0; i< SL->n; i++){
+        norma += pow(res[i], 2);
+    }
+
+    norma = sqrt(norma);
+
+    return norma;
+};
+
 
 /*!
   \brief Método de Refinamento
@@ -223,44 +221,49 @@ int gaussSeidel (SistLinear_t *SL, real_t *x, double *tTotal){
           -1 (não converge) -2 (sem solução)
   */
 int refinamento (SistLinear_t *SL, real_t *x, double *tTotal){
-    //faz uma copia do sistema de entrada
-    SistLinear_t * SL_copy = alocaSistLinear(SL->n);
-    cpySist(SL_copy, SL);
+    real_t * w = calloc(SL->n, sizeof(real_t));
+    real_t * r = calloc(SL->n, sizeof(real_t));
 
-    real_t * w = calloc(SL_copy->n, sizeof(real_t));
-    real_t * r = calloc(SL_copy->n, sizeof(real_t));
+    real_t * x_old = calloc(SL->n, sizeof(real_t));
+    real_t * x_new = calloc(SL->n, sizeof(real_t));
 
-    real_t * x_old = calloc(SL_copy->n, sizeof(real_t));
-    real_t * x_new = calloc(SL_copy->n, sizeof(real_t));
-
-    cpyVector(x_new, x, SL_copy->n);
+    cpyVector(x_new, x, SL->n);
 
     int it_count = 0;
     double seidel_t, start_t = timestamp();
+    real_t norma, it_erro;
     for(it_count=0; it_count<MAXIT; it_count++){
 
         //calcular residuo e testa primeira condicao de parada
-        if(normaL2Residuo(SL_copy, x_new, r) <= SL_copy->erro){
+        norma = normaL2Residuo(SL, x_new, r);
+        // printf("norma (%lf) <= erro(%lf)\n", norma, SL->erro);
+        if(norma <= SL->erro){
             break;
         }
 
         //obter w resolvendo AW = r
-        SL_copy->b = r;
-        gaussSeidel(SL_copy, w, &seidel_t);
+        SL->b = r;
+        // prnVetor(r, SL->n);
+        // prnSistLinear(SL);
+        eliminacaoGauss(SL, w, &seidel_t);
 
         //obter nova solucao x(i) + w
-        x_new = sumVector(x_old, w, SL_copy->n);
+        x_new = sumVector(x_old, w, SL->n);
 
         //testar segundo criterio de parada
-        if(calculateError(x_old, x_new, SL_copy->n) <= SL_copy->erro){
+        it_erro = calculateError(x_old, x_new, SL->n);
+        // printf("it_erro (%lf) <= erro(%lf) \n",it_erro, SL->erro);
+        if(calculateError(x_old, x_new, SL->n) <= SL->erro){
             break;
         }
 
         //x_old = x_new
-        cpyVector(x_old, x_new, SL_copy->n);
+        cpyVector(x_old, x_new, SL->n);
     }
 
     *tTotal = timestamp() - start_t;
+
+    cpyVector(x, x_new, SL->n);
 
     return it_count;
 };

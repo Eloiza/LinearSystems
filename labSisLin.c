@@ -4,10 +4,11 @@
 
 #include "utils.h"
 #include "SistemasLineares.h"
+#include "SupportFunctions.h"
 
 int main (){
     double Gauss_t, Jacobi_t, Seidel_t, ref_t, norma;
-    SistLinear_t * sistLin;
+    SistLinear_t * sistLin, *sist_copy;
 
     char c = 'a';
     int n_sistema = 1, it;
@@ -19,72 +20,74 @@ int main (){
             prnSistLinear(sistLin);
 
             real_t * solucao = malloc(sizeof(real_t) * sistLin->n);
+            sist_copy = alocaSistLinear(sistLin->n);
+            cpySist(sist_copy, sistLin);
 
             //resolve sistema pela eliminacao de Gauss
             printf("===========Eliminação de Gauss===========\n\n");
-            eliminacaoGauss(sistLin, solucao, &Gauss_t);
-            prnVetor(solucao, sistLin->n);
-            printf("Tempo: %lf\n", Gauss_t);
-
+            eliminacaoGauss(sist_copy, solucao, &Gauss_t);
             norma = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+            prnSolucao(solucao, sistLin->n, Gauss_t, it, norma);
 
             if(norma >= 5.0){
                 printf("===============Refinamento==============\n\n");
-                it = refinamento(sistLin, solucao, &ref_t);
-                prnVetor(solucao, sistLin->n);
-                printf("Iterações: %i\n", it);
-                printf("Tempo: %lf\n", ref_t);
+                //reseta sist_copy
+                cpySist(sist_copy, sistLin);
 
+                //aplica metodo de refinamento
+                it = refinamento(sist_copy, solucao, &ref_t);
+
+                //calcula a norma para a nova solucao encontrada
                 norma = normaL2Residuo(sistLin, solucao, NULL);
-                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
             }
 
-
             printf("===============Gauss Jacobi==============\n\n");
-            it = gaussJacobi(sistLin, solucao, &Jacobi_t);
-            prnVetor(solucao, sistLin->n);
-            printf("Iterações: %i\n", it);
-            printf("Tempo: %lf\n", Jacobi_t);
 
+            it = gaussJacobi(sistLin, solucao, &Jacobi_t);
             norma = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+            prnSolucao(solucao, sistLin->n, Jacobi_t, it, norma);
 
             if(norma >= 5.0){
                 printf("===============Refinamento==============\n\n");
-                it = refinamento(sistLin, solucao, &ref_t);
-                prnVetor(solucao, sistLin->n);
-                printf("Iterações: %i\n", it);
-                printf("Tempo: %lf\n", ref_t);
+                //reseta sist_copy
+                cpySist(sist_copy, sistLin);
 
+                it = refinamento(sist_copy, solucao, &ref_t);
                 norma = normaL2Residuo(sistLin, solucao, NULL);
-                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
             }
 
 
             printf("===============Gauss Seidel===============\n\n");
-            it = gaussSeidel(sistLin, solucao, &Seidel_t);
-            prnVetor(solucao, sistLin->n);
-            printf("Iterações: %i\n", it);
-            printf("Tempo: %lf\n", Seidel_t);
 
+            it = gaussSeidel(sistLin, solucao, &Seidel_t);
+
+            //calcula norma da solucao
             norma = normaL2Residuo(sistLin, solucao, NULL);
-            printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+            prnSolucao(solucao, sistLin->n, Seidel_t, it, norma);
 
             if(norma >= 5.0){
                 printf("===============Refinamento==============\n\n");
-                it = refinamento(sistLin, solucao, &ref_t);
-                prnVetor(solucao, sistLin->n);
-                printf("Iterações: %i\n", it);
-                printf("Tempo: %lf\n", ref_t);
+                //reseta sist_copy
+                cpySist(sist_copy, sistLin);
 
+                it = refinamento(sist_copy, solucao, &ref_t);
+
+                //cacula a norma para a nova solucao
                 norma = normaL2Residuo(sistLin, solucao, NULL);
-                printf("Norma L2 do residuo: %1.9e\n\n", norma);
+
+                prnSolucao(solucao, sistLin->n, ref_t, it, norma);
             }
 
             n_sistema++;
 
             liberaSistLinear(sistLin);
+            liberaSistLinear(sist_copy);
         }
         //get the \n or EOF
         c = getchar();

@@ -1,6 +1,15 @@
 #include "SupportFunctions.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+void prnSolucao(real_t * solucao, int n, double tempo, int iteracoes, double norma){
+    printf("X: ");
+    prnVetor(solucao, n);
+    printf("Tempo: %lf\n", tempo);
+    printf("Iterações: %i\n", iteracoes);
+    printf("Norma L2 do residuo: %1.9e\n\n", norma);
+}
 
 real_t * sumVector(real_t * a, real_t * b, unsigned int size){
     real_t * sum = malloc(sizeof(real_t)*size);

@@ -1,5 +1,9 @@
 #include "SistemasLineares.h"
 
+/*Escreve na tela a soluação encontrada e informações sobre a execucao
+dos métodos*/
+void prnSolucao(real_t * solucao, int n, double tempo, int iteracoes, double norma);
+
 /*Soma dois vetores de mesmo tamanho. O resultado é guardado em
 um terceiro vetor de mesmo tipo*/
 real_t * sumVector(real_t * a, real_t * b, unsigned int size);
